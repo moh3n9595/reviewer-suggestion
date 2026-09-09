@@ -11,6 +11,24 @@ if (tag) {
   );
   if (!metadata.dist?.attestations?.provenance)
     throw new Error('Published provenance missing');
+  if (metadata.gitHead !== sha)
+    throw new Error(`npm gitHead does not match release commit: ${version}`);
+  const release = JSON.parse(
+    run('gh', [
+      'release',
+      'view',
+      tag,
+      '--json',
+      'tagName,body,isDraft,isPrerelease',
+    ]),
+  );
+  if (
+    release.tagName !== tag ||
+    release.isDraft ||
+    release.isPrerelease ||
+    !release.body?.trim()
+  )
+    throw new Error(`GitHub release changelog is missing or invalid: ${tag}`);
   run('git', ['tag', '-f', `v${version.split('.')[0]}`, sha]);
   run('git', [
     'push',

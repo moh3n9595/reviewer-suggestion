@@ -111,6 +111,8 @@ try {
       'utf8',
     ),
   );
+  if (manifest.bin?.['reviewer-suggestion'] !== 'dist/cli.js')
+    throw new Error('Published manifest is missing the CLI executable mapping');
   if (manifest.dependencies && Object.keys(manifest.dependencies).length)
     throw new Error('Unexpected runtime dependencies');
   console.log(
