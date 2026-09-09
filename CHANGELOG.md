@@ -2,6 +2,16 @@
 
 All notable changes are recorded here automatically from Conventional Commits. The same notes are published with each synchronized npm and GitHub release.
 
+## [1.1.1](https://github.com/moh3n9595/reviewer-suggestion/compare/v1.1.0...v1.1.1) (2026-09-09)
+
+### Bug Fixes
+
+- tolerate npm registry propagation ([#11](https://github.com/moh3n9595/reviewer-suggestion/issues/11)) ([8e1c257](https://github.com/moh3n9595/reviewer-suggestion/commit/8e1c2574149134d3bb6b808e410cf7485ab24515))
+
+### GitHub Action · Code review
+
+This release also publishes the bundled GitHub Action from the immutable `v1.1.1` tag. Workflows that follow compatible updates can use `moh3n9595/reviewer-suggestion@v1`; the moving major tag advances only after npm provenance and GitHub Release synchronization pass.
+
 # [1.1.0](https://github.com/moh3n9595/reviewer-suggestion/compare/v1.0.0...v1.1.0) (2026-09-09)
 
 ### Features
