@@ -2,14 +2,20 @@ import { execFileSync } from 'node:child_process';
 import { setTimeout as wait } from 'node:timers/promises';
 const run = (command, args) =>
   execFileSync(command, args, { encoding: 'utf8' }).trim();
+const registryAttempts = 60;
 const publishedMetadata = async (version) => {
-  for (let attempt = 1; attempt <= 12; attempt++) {
+  for (let attempt = 1; attempt <= registryAttempts; attempt++) {
     try {
       return JSON.parse(
-        run('npm', ['view', `reviewer-suggestion@${version}`, '--json']),
+        run('npm', [
+          'view',
+          `reviewer-suggestion@${version}`,
+          '--json',
+          '--prefer-online',
+        ]),
       );
     } catch (error) {
-      if (attempt === 12) throw error;
+      if (attempt === registryAttempts) throw error;
       await wait(5_000);
     }
   }
