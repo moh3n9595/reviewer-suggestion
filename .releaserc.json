@@ -1,5 +1,6 @@
 {
   "branches": ["main"],
+  "repositoryUrl": "git@github.com:moh3n9595/reviewer-suggestion.git",
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",

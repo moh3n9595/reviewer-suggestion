@@ -52,11 +52,13 @@ Version tags such as `v1.0.0` remain immutable. The major tag is the stable
 reference intended for `uses: ...@v1`; it is expected to appear beside the exact
 release tag. Workflows in this repository use pinned Action SHAs.
 
-The release-only changelog commit uses GitHub Actions' protected-branch bypass.
-Keep `contents: write` limited to the trusted release workflow. Marketplace
-publication is an owner action in GitHub's release UI because GitHub requires the
-Marketplace agreement, two-factor authentication, and selection of the **Code
-review** category; the public API does not expose those controls.
+The release-only changelog commit and tags use a write-enabled deploy key scoped
+to this repository. Store its private key as `RELEASE_DEPLOY_KEY` in the protected
+`npm` environment, list that deploy key as the sole bypass actor in the `main`
+ruleset, and keep `contents: write` limited to the trusted release workflow.
+Marketplace publication is an owner action in GitHub's release UI because GitHub
+requires the Marketplace agreement, two-factor authentication, and selection of
+the **Code review** category; the public API does not expose those controls.
 
 ## Failure recovery
 
