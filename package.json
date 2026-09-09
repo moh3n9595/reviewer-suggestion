@@ -19,7 +19,7 @@
     }
   },
   "bin": {
-    "reviewer-suggestion": "./dist/cli.js"
+    "reviewer-suggestion": "dist/cli.js"
   },
   "files": [
     "dist",

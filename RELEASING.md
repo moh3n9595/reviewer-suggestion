@@ -45,6 +45,9 @@ Successful CI pushes on `main` trigger the release workflow. `fix` means patch,
 `feat` minor, and breaking changes major. Docs/chore-only changes do not publish.
 Jobs serialize publication; they install from the frozen pnpm lockfile, verify the
 code, version/build/check the package, publish, and create GitHub release notes.
+Before advancing the Action major tag, the workflow confirms that npm provenance
+and `gitHead` identify the release commit and that the matching non-draft GitHub
+Release contains a changelog.
 
 The Action bundle is tracked at the version's source commit. After publication
 and provenance verification, its major tag (for example `v1`) moves to that commit.
