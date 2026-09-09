@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+language: en-US
+tone_instructions: Be concise, precise, and focus on findings that affect correctness, security, compatibility, or maintainability.
+
+reviews:
+  profile: assertive
+  request_changes_workflow: true
+  high_level_summary: true
+  high_level_summary_in_walkthrough: true
+  changed_files_summary: true
+  review_status: true
+  collapse_walkthrough: false
+  sequence_diagrams: true
+  estimate_code_review_effort: true
+  poem: false
+  path_filters:
+    - '!action-dist/**'
+    - '!dist/**'
+    - '!coverage/**'
+    - '!docs-api/**'
+    - '!pnpm-lock.yaml'
+  path_instructions:
+    - path: 'src/**'
+      instructions: Check determinism, provider parity, error typing, cancellation, retries, pagination, credential redaction, and assignment preservation.
+    - path: 'tests/**'
+      instructions: Require meaningful edge-case coverage and preserve the repository's 100% per-file coverage gate without implementation-mirroring tests.
+    - path: '.github/workflows/**'
+      instructions: Check least-privilege permissions, immutable action pins, trusted publishing identity, untrusted pull-request boundaries, and npm/GitHub release synchronization.
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: true
+
+chat:
+  auto_reply: true

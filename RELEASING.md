@@ -40,14 +40,25 @@ respective service confirms it.
 Successful CI pushes on `main` trigger the release workflow. `fix` means patch,
 `feat` minor, and breaking changes major. Docs/chore-only changes do not publish.
 Jobs serialize publication; they install from the frozen pnpm lockfile, verify the
-code, version/build/check the package, publish, and create GitHub release notes.
+code, version/build/check the package, publish, commit the generated changelog,
+attach the runnable Action bundle, and create matching GitHub release notes.
 Before advancing the Action major tag, the workflow confirms that npm provenance
 and `gitHead` identify the release commit and that the matching non-draft GitHub
 Release contains a changelog.
 
 The Action bundle is tracked at the version's source commit. After publication
 and provenance verification, its major tag (for example `v1`) moves to that commit.
-Version tags such as `v1.0.0` remain immutable. Workflows use pinned Action SHAs.
+Version tags such as `v1.0.0` remain immutable. The major tag is the stable
+reference intended for `uses: ...@v1`; it is expected to appear beside the exact
+release tag. Workflows in this repository use pinned Action SHAs.
+
+The release-only changelog commit and tags use a write-enabled deploy key scoped
+to this repository. Store its private key as `RELEASE_DEPLOY_KEY` in the protected
+`npm` environment, list that deploy key as the sole bypass actor in the `main`
+ruleset, and keep `contents: write` limited to the trusted release workflow.
+Marketplace publication is an owner action in GitHub's release UI because GitHub
+requires the Marketplace agreement, two-factor authentication, and selection of
+the **Code review** category; the public API does not expose those controls.
 
 ## Failure recovery
 
