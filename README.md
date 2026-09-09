@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/moh3n9595/reviewer-suggestion/main/assets/logo.png" alt="Reviewer Suggestion" width="120" height="120">
+  <img src="https://github.com/moh3n9595/reviewer-suggestion/raw/main/assets/logo.png" alt="Reviewer Suggestion" width="120" height="120">
 </p>
 
 # Reviewer Suggestion
