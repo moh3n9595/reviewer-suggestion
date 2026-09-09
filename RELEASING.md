@@ -46,6 +46,10 @@ Before advancing the Action major tag, the workflow confirms that npm provenance
 and `gitHead` identify the release commit and that the matching non-draft GitHub
 Release contains a changelog.
 
+The synchronization check forces online registry revalidation for up to five
+minutes because npm can acknowledge a trusted publication before the new version
+is visible from every registry edge.
+
 The Action bundle is tracked at the version's source commit. After publication
 and provenance verification, its major tag (for example `v1`) moves to that commit.
 Version tags such as `v1.0.0` remain immutable. The major tag is the stable
