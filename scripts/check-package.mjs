@@ -28,7 +28,8 @@ try {
     ]),
   )[0];
   const files = packed.files.map((file) => file.path);
-  const allowed = /^(dist\/|package\.json$|README\.md$|LICENSE$)/;
+  const allowed =
+    /^(dist\/|package\.json$|README\.md$|CHANGELOG\.md$|LICENSE$)/;
   if (files.some((path) => !allowed.test(path)))
     throw new Error(
       `Unexpected package contents: ${files.filter((path) => !allowed.test(path)).join(', ')}`,
@@ -40,6 +41,7 @@ try {
     'dist/index.d.cts',
     'dist/cli.js',
     'README.md',
+    'CHANGELOG.md',
     'LICENSE',
   ])
     if (!files.includes(file)) throw new Error(`Missing ${file}`);

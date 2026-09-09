@@ -12,8 +12,57 @@ coverage:
         target: 100%
         threshold: 0%
 comment:
-  layout: reach,diff,flags,files
+  layout: reach,diff,flags,components,files
   behavior: default
+flag_management:
+  default_rules:
+    carryforward: false
+    statuses:
+      - type: project
+        target: 100%
+        threshold: 0%
+      - type: patch
+        target: 100%
+        threshold: 0%
+  individual_flags:
+    - name: unit
+      paths:
+        - src/**
+component_management:
+  default_rules:
+    statuses:
+      - type: project
+        target: 100%
+        threshold: 0%
+      - type: patch
+        target: 100%
+        threshold: 0%
+  individual_components:
+    - component_id: ranking-engine
+      name: Ranking engine
+      paths:
+        - src/ranking.ts
+        - src/codeowners.ts
+        - src/config.ts
+    - component_id: provider-integration
+      name: Provider integration
+      paths:
+        - src/http.ts
+        - src/service.ts
+        - src/providers/**
+    - component_id: user-interfaces
+      name: CLI and Action
+      paths:
+        - src/action-entry.ts
+        - src/action.ts
+        - src/cli-runner.ts
+        - src/cli.ts
+    - component_id: public-contract
+      name: Public contract
+      paths:
+        - src/index.ts
+        - src/types.ts
+        - src/errors.ts
 ignore:
   - action-dist/**
   - dist/**

@@ -247,13 +247,15 @@ Assignment revalidates identities and eligibility, rejects closed/draft requests
 - Strict TypeScript and type-aware ESLint, with Prettier formatting.
 - Vitest unit, HTTP-fixture, entrypoint, and property-based tests.
 - Required **100% per-file** statements, branches, functions, and lines for authored runtime source.
-- Codecov reporting and CodeFactor analysis; badges display the actual external results.
+- Codecov reporting with a `unit` flag, 100% component gates, and Vite bundle
+  analysis for the shipped Action; CodeFactor analysis; badges display the
+  actual external results.
 - Installed-package checks for ESM, CommonJS, TypeScript, and the CLI on Linux, macOS, and Windows.
 - GitHub Actions builds and npm provenance; inspect the package's **Built and signed on GitHub Actions** details on npm after publication.
 
 Verify installed registry signatures and attestations with `npm audit signatures`. Provenance links a published artifact to its build; it is not a correctness guarantee. See [npm provenance](https://docs.npmjs.com/generating-provenance-statements/).
 
-Releases follow Conventional Commits: `fix` publishes a patch, `feat` a minor, and breaking changes a major. Eligible `main` merges release automatically after checks pass. See [release setup](RELEASING.md).
+Releases follow Conventional Commits: `fix` publishes a patch, `feat` a minor, and breaking changes a major. Eligible `main` merges release automatically after checks pass. Each release updates the committed [changelog](CHANGELOG.md), publishes matching npm and GitHub versions, attaches the runnable Action bundle, and advances the compatible major Action tag only after synchronization checks pass. `v1.2.3` is an immutable release; `v1` intentionally moves to the newest compatible v1 Action. See [release setup](RELEASING.md).
 
 ## Contributing
 

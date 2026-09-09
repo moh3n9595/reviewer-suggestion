@@ -1,9 +1,6 @@
-// src/action-entry.ts
 import { appendFile, readFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
-
-// src/errors.ts
-var ReviewerError = class extends Error {
+class ReviewerError extends Error {
   /** @param code - Stable machine-readable failure code. @param message - Safe diagnostic. */
   constructor(code, message) {
     super(message);
@@ -11,12 +8,10 @@ var ReviewerError = class extends Error {
     this.name = "ReviewerError";
   }
   code;
-};
+}
 function errorCode(error) {
   return error instanceof ReviewerError ? error.code : "UNEXPECTED_ERROR";
 }
-
-// src/http.ts
 function object(value) {
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new ReviewerError("INVALID_RESPONSE", "Expected an API object.");
@@ -42,7 +37,7 @@ function number(value) {
     throw new ReviewerError("INVALID_RESPONSE", "Expected an API number.");
   return value;
 }
-var HttpClient = class {
+class HttpClient {
   /** @param apiUrl - API root. @param options - Request policy. @param headers - Authentication headers. */
   constructor(apiUrl, options, headers) {
     this.options = options;
@@ -193,17 +188,15 @@ var HttpClient = class {
       "Provider pagination exceeded the configured page budget."
     );
   }
-};
-
-// src/ranking.ts
-var DEFAULT_WEIGHTS = Object.freeze({
+}
+const DEFAULT_WEIGHTS = Object.freeze({
   expertise: 0.45,
   ownership: 0.25,
   recency: 0.15,
   access: 0.1,
   availability: 0.05
 });
-var defaults = {
+const defaults = {
   limit: 2,
   minScore: 0.05,
   historyLimit: 30,
@@ -212,10 +205,10 @@ var defaults = {
   horizonDays: 180,
   fallback: false
 };
-var keys = Object.keys(DEFAULT_WEIGHTS);
-var lower = (value) => value.toLowerCase();
-var clamp = (n) => Number.isFinite(n) ? Math.max(0, Math.min(1, n)) : 0;
-var compare = (a, b) => Number(a > b) - Number(a < b);
+const keys = Object.keys(DEFAULT_WEIGHTS);
+const lower = (value) => value.toLowerCase();
+const clamp = (n) => Number.isFinite(n) ? Math.max(0, Math.min(1, n)) : 0;
+const compare = (a, b) => Number(a > b) - Number(a < b);
 function resolveOptions(options) {
   const result = {
     ...defaults,
@@ -366,9 +359,7 @@ function rankReviewers(snapshot, options = {}) {
     context: snapshot.context
   };
 }
-
-// src/config.ts
-var rankingKeys = /* @__PURE__ */ new Set([
+const rankingKeys = /* @__PURE__ */ new Set([
   "limit",
   "minScore",
   "historyLimit",
@@ -396,8 +387,6 @@ function parseConfig(content) {
     );
   }
 }
-
-// src/providers/github.ts
 function createGitHubProvider(options) {
   const http = new HttpClient(
     options.apiUrl ?? "https://api.github.com",
@@ -564,8 +553,6 @@ function createGitHubProvider(options) {
     }
   };
 }
-
-// src/providers/gitlab.ts
 function createGitLabProvider(options) {
   const http = new HttpClient(
     options.apiUrl ?? "https://gitlab.com/api/v4",
@@ -778,8 +765,6 @@ function createGitLabProvider(options) {
     }
   };
 }
-
-// src/codeowners.ts
 function parseCodeOwners(content, platform) {
   const rules = [];
   let section = "";
@@ -852,8 +837,6 @@ function resolveCodeOwners(path, rules) {
   }
   return [...new Set([...sections.values()].flat())].sort();
 }
-
-// src/service.ts
 function validateRequest(request) {
   if (!request.repository.trim() || !Number.isSafeInteger(request.number) || request.number < 1)
     throw new ReviewerError(
@@ -1038,9 +1021,7 @@ async function assignReviewers(provider, request, reviewers) {
     }
   }
 }
-
-// src/action.ts
-var escape = (value) => value.replace(/[&<>|\r\n]/g, (char) => `&#${char.charCodeAt(0)};`);
+const escape = (value) => value.replace(/[&<>|\r\n]/g, (char) => `&#${char.charCodeAt(0)};`);
 async function runAction(io) {
   const platform = io.input("provider") || "github";
   if (platform !== "github" && platform !== "gitlab")
@@ -1104,8 +1085,6 @@ ${result.partial ? "Some optional signals were unavailable. Inspect result.warni
       "Some reviewers could not be assigned. Inspect the assignment output."
     );
 }
-
-// src/action-entry.ts
 try {
   await runAction({
     input: (name) => process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] ?? "",

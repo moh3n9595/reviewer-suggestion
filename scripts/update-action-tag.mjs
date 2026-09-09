@@ -37,9 +37,12 @@ if (tag) {
     release.tagName !== tag ||
     release.isDraft ||
     release.isPrerelease ||
-    !release.body?.trim()
+    !release.body?.trim() ||
+    !release.body.includes('### GitHub Action · Code review')
   )
-    throw new Error(`GitHub release changelog is missing or invalid: ${tag}`);
+    throw new Error(
+      `GitHub release changelog or Action release notes are missing: ${tag}`,
+    );
   run('git', ['tag', '-f', `v${version.split('.')[0]}`, sha]);
   run('git', [
     'push',
