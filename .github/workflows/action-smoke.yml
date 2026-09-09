@@ -1,0 +1,42 @@
+name: Live Action smoke test
+on:
+  workflow_dispatch:
+    inputs:
+      number:
+        description: Pull request number in this repository
+        required: true
+        type: string
+      ref:
+        description: Source commit or released Action tag to test
+        default: main
+        type: string
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  suggest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: ./
+        id: suggest
+        with:
+          repository: ${{ github.repository }}
+          number: ${{ inputs.number }}
+          assign: 'false'
+      - name: Validate real-provider outputs
+        env:
+          REVIEWERS: ${{ steps.suggest.outputs.reviewers }}
+          RESULT: ${{ steps.suggest.outputs.result }}
+          ASSIGNMENT: ${{ steps.suggest.outputs.assignment }}
+        run: |
+          node --input-type=module -e '
+            const reviewers = JSON.parse(process.env.REVIEWERS);
+            const result = JSON.parse(process.env.RESULT);
+            const assignment = JSON.parse(process.env.ASSIGNMENT);
+            if (!Array.isArray(reviewers) || !Array.isArray(result.selected)) throw Error("Invalid outputs");
+            if (assignment.assigned.length !== 0) throw Error("Suggestion unexpectedly assigned reviewers");
+            console.log(`Live API: ${reviewers.length} suggestions; partial=${result.partial}`);
+          '
