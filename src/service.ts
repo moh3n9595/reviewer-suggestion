@@ -26,9 +26,9 @@ function validateRequest(request: RequestReference): void {
 
 /**
  * Collect repository evidence and suggest reviewers without changing the request.
- * @param provider GitHub, GitLab, or an implementation of the provider contract.
- * @param request Repository and PR number/MR IID.
- * @param options Ranking options; optional failures are returned as warnings.
+ * @param provider - GitHub, GitLab, or an implementation of the provider contract.
+ * @param request - Repository and PR number/MR IID.
+ * @param options - Ranking options; optional failures are returned as warnings.
  * @returns Explained selections and captured request metadata.
  * @throws {@link ReviewerError} If essential context, eligibility, or options fail.
  */
@@ -170,9 +170,9 @@ export async function suggestReviewers(
 /**
  * Explicitly request reviews, preserving existing assignments.
  * Revalidates eligibility and re-reads assignment state after ambiguous writes.
- * @param provider Provider with write-capable credentials.
- * @param request Repository and PR number/MR IID.
- * @param reviewers Provider-qualified identities, normally from suggestion results.
+ * @param provider - Provider with write-capable credentials.
+ * @param request - Repository and PR number/MR IID.
+ * @param reviewers - Provider-qualified identities, normally from suggestion results.
  * @returns Assigned, already assigned, and failed identities; no automatic removals.
  * @throws {@link ReviewerError} For closed/draft requests, invalid identities, or missing essential context.
  * @remarks Provider APIs cannot guarantee atomicity against concurrent external edits.

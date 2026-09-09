@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 
 // src/errors.ts
 var ReviewerError = class extends Error {
-  /** @param code Stable machine-readable failure code. @param message Safe diagnostic. */
+  /** @param code - Stable machine-readable failure code. @param message - Safe diagnostic. */
   constructor(code, message) {
     super(message);
     this.code = code;
@@ -43,7 +43,7 @@ function number(value) {
   return value;
 }
 var HttpClient = class {
-  /** @param apiUrl API root. @param options Request policy. @param headers Authentication headers. */
+  /** @param apiUrl - API root. @param options - Request policy. @param headers - Authentication headers. */
   constructor(apiUrl, options, headers) {
     this.options = options;
     this.headers = headers;

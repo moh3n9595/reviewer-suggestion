@@ -107,8 +107,8 @@ function authorResolver(
 
 /**
  * Rank normalized repository evidence deterministically without network requests.
- * @param snapshot Captured request, candidates, file evidence, and known review loads.
- * @param options Ranking policy; defaults to two suggestions and no fallback.
+ * @param snapshot - Captured request, candidates, file evidence, and known review loads.
+ * @param options - Ranking policy; defaults to two suggestions and no fallback.
  * @returns Explained rankings; no candidates is a successful empty result.
  * @throws {@link ReviewerError} For invalid ranking options.
  * @example

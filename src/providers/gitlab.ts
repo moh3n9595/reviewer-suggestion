@@ -10,7 +10,7 @@ import type {
 
 /**
  * Create a GitLab REST provider, including Self-Managed hosts.
- * @param options Token and optional full API root (ending in /api/v4).
+ * @param options - Token and optional full API root (ending in /api/v4).
  * @returns A provider; creation performs no network requests.
  * @throws {@link ReviewerError} For invalid authentication or transport configuration.
  * @example

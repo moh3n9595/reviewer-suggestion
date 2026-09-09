@@ -1,7 +1,7 @@
 {
   "name": "reviewer-suggestion",
   "version": "0.0.0-development",
-  "description": "Explainable, deterministic reviewer suggestions for GitHub and GitLab \u2014 library, CLI, and Action.",
+  "description": "Explainable, deterministic reviewer suggestions for GitHub and GitLab — library, CLI, and Action.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -86,6 +86,7 @@
     "esbuild": "^0.28.1",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.0",
+    "eslint-plugin-tsdoc": "^0.5.2",
     "fast-check": "^4.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.0.0",

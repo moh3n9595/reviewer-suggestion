@@ -21,6 +21,8 @@ use squash merges. Releases are driven by commits that land on `main`.
 Run `pnpm build:action` and commit changes in `action-dist/` whenever runtime code
 changes. CI rebuilds this bundle and checks for drift. Library `dist/` files are
 built in CI and excluded from Git. Keep public API examples and TSDoc current.
+ESLint enforces TSDoc syntax with `eslint-plugin-tsdoc`; malformed tags fail both
+the pre-commit hook and CI. TypeDoc generates the API site from these comments.
 
 Coverage must remain 100% per authored runtime source file. Exercise failure
 behavior and invariants; do not exclude business logic to meet the target.

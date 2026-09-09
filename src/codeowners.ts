@@ -11,8 +11,8 @@ export interface OwnerRule {
 
 /**
  * Parse CODEOWNERS using provider-specific sections and exclusions.
- * @param content UTF-8 CODEOWNERS text.
- * @param platform GitHub or GitLab syntax.
+ * @param content - UTF-8 CODEOWNERS text.
+ * @param platform - GitHub or GitLab syntax.
  * @returns Rules in source order; invalid GitHub negations/classes are skipped.
  */
 export function parseCodeOwners(
@@ -86,8 +86,8 @@ function matches(pattern: string, path: string): boolean {
 /**
  * Resolve ownership, using the last matching rule within each section.
  * GitLab exclusions permanently exclude matching paths within that section.
- * @param path Repository-relative, case-sensitive file path.
- * @param rules Parsed CODEOWNERS rules.
+ * @param path - Repository-relative, case-sensitive file path.
+ * @param rules - Parsed CODEOWNERS rules.
  * @returns Deduplicated owner references; groups are resolved by the provider.
  */
 export function resolveCodeOwners(path: string, rules: OwnerRule[]): string[] {

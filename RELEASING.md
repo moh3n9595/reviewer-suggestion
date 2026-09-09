@@ -14,17 +14,23 @@ remain at `0.0.0-development`; release tags and npm metadata are authoritative.
 3. Create the GitHub `npm` environment, restricted to the `main` branch. Configure
    branch protection to require `Release readiness`, `codecov/project`, and
    `CodeFactor`; use squash merges with Conventional Commit titles.
-4. For the initial publish only, create a short-lived granular npm token with
-   permission to create/publish this package and bypass 2FA for CI. Store it as
-   the environment secret `NPM_BOOTSTRAP_TOKEN`. Never put the token in files.
-5. Set repository variable `RELEASE_ENABLED=true`, then dispatch `release.yml`.
-   Release checks independently verify the current main commit before publishing.
-6. In npm package settings, configure the trusted publisher for GitHub user
+4. For the first publish, supply a short-lived publishing credential through the
+   `NPM_BOOTSTRAP_TOKEN` secret in the GitHub `npm` environment. Enable
+   `RELEASE_ENABLED` and dispatch `release.yml`; the GitHub-hosted runner publishes
+   with provenance after all quality gates pass.
+5. After the first publish, configure npm's trusted publisher for GitHub user
    `moh3n9595`, repository `reviewer-suggestion`, workflow `release.yml`, environment
    `npm`, with **direct npm publish allowed**.
-7. Remove the bootstrap secret and revoke the token. Subsequent releases use
-   GitHub OIDC. Restrict traditional token publishing in npm package settings.
-8. Confirm npm's provenance display points to the expected repository/workflow.
+   Alternatively, an authenticated owner with 2FA and npm 11.15+ can run:
+
+   ```sh
+   npm trust github reviewer-suggestion --repo moh3n9595/reviewer-suggestion --file release.yml --env npm --allow-publish
+   ```
+
+6. Delete `NPM_BOOTSTRAP_TOKEN` from the environment and revoke the credential.
+   Subsequent releases authenticate through GitHub OIDC without an npm secret.
+   See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
+7. Confirm npm's provenance display points to the expected repository/workflow.
    Install the released version in a clean project and run `npm audit signatures`.
 
 Account-owner interaction may be required for npm 2FA and service installation.

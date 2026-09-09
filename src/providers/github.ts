@@ -10,7 +10,7 @@ import type {
 
 /**
  * Create a GitHub REST provider for GitHub.com or an Enterprise API root.
- * @param options Token, optional API URL, injectable fetch/logger, and request limits.
+ * @param options - Token, optional API URL, injectable fetch/logger, and request limits.
  * @returns A provider; creation performs no network requests.
  * @throws {@link ReviewerError} For invalid authentication or transport configuration.
  * @example

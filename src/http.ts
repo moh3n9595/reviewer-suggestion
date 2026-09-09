@@ -42,7 +42,7 @@ export class HttpClient {
   private readonly concurrency: number;
   private active = 0;
   private readonly waiting: (() => void)[] = [];
-  /** @param apiUrl API root. @param options Request policy. @param headers Authentication headers. */
+  /** @param apiUrl - API root. @param options - Request policy. @param headers - Authentication headers. */
   constructor(
     apiUrl: string,
     private readonly options: ProviderOptions,
