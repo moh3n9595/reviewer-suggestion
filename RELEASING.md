@@ -13,7 +13,9 @@ remain at `0.0.0-development`; release tags and npm metadata are authoritative.
    grade A, and confirm its `CodeFactor` check succeeds.
 3. Create the GitHub `npm` environment, restricted to the `main` branch. Configure
    branch protection to require `Release readiness`, `codecov/project`, and
-   `CodeFactor`; use squash merges with Conventional Commit titles.
+   `CodeFactor`; use squash merges with Conventional Commit titles. CodeFactor
+   validates the pull-request head before merge because it does not emit another
+   check for the squash commit on `main`.
 4. For the first publish, supply a short-lived publishing credential through the
    `NPM_BOOTSTRAP_TOKEN` secret in the GitHub `npm` environment. Enable
    `RELEASE_ENABLED` and dispatch `release.yml`; the GitHub-hosted runner publishes
