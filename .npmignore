@@ -1,0 +1,14 @@
+src/
+tests/
+examples/
+scripts/
+action-dist/
+.github/
+.husky/
+coverage/
+docs-api/
+.env*
+*.config.*
+tsconfig.json
+action.yml
+*.tgz

@@ -1,0 +1,16 @@
+name: Bug report
+description: Report incorrect rankings or integration failures
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include package/Node/provider versions and sanitized diagnostics. Do not include tokens or private emails.
+    validations:
+      required: true

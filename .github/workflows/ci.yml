@@ -1,0 +1,108 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+        env:
+          HUSKY: '0'
+      - run: pnpm run verify
+      - run: pnpm run check:action
+      - name: Validate PR commit messages and title
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          printf '%s\n' "$PR_TITLE" | pnpm exec commitlint
+          pnpm exec commitlint --from "$BASE_SHA" --to "$HEAD_SHA"
+      - name: Validate main commit messages
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: pnpm exec commitlint --from "$BEFORE" --to "$AFTER"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: coverage
+          path: coverage/lcov.info
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: api-docs
+          path: docs-api
+  compatibility:
+    name: Compatibility (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node: 22.14.0
+          - os: ubuntu-latest
+            node: 24.20.0
+          - os: windows-latest
+            node: 24.20.0
+          - os: macos-latest
+            node: 24.20.0
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+        env:
+          HUSKY: '0'
+      - run: pnpm test
+      - run: pnpm run build
+      - run: pnpm run check:package
+  coverage:
+    name: Codecov
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: coverage
+          path: coverage
+      - uses: codecov/codecov-action@04b047e8bb82a0c002c8312c1c880fbc6a999d45 # v5
+        with:
+          use_oidc: true
+          files: coverage/lcov.info
+          fail_ci_if_error: true
+  ready:
+    name: Release readiness
+    if: always()
+    needs: [verify, compatibility, coverage]
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          VERIFY: ${{ needs.verify.result }}
+          COMPATIBILITY: ${{ needs.compatibility.result }}
+          COVERAGE: ${{ needs.coverage.result }}
+        run: test "$VERIFY" = success && test "$COMPATIBILITY" = success && test "$COVERAGE" = success

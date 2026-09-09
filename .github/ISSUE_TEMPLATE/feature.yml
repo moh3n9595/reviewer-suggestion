@@ -1,0 +1,9 @@
+name: Feature request
+description: Propose a new capability
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem should this solve?
+    validations:
+      required: true

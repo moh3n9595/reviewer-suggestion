@@ -1,0 +1,109 @@
+{
+  "name": "reviewer-suggestion",
+  "version": "0.0.0-development",
+  "description": "Explainable, deterministic reviewer suggestions for GitHub and GitLab \u2014 library, CLI, and Action.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "bin": {
+    "reviewer-suggestion": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moh3n9595/reviewer-suggestion.git"
+  },
+  "homepage": "https://moh3n9595.github.io/reviewer-suggestion/",
+  "bugs": {
+    "url": "https://github.com/moh3n9595/reviewer-suggestion/issues"
+  },
+  "author": "Mohsen Madani",
+  "license": "MIT",
+  "keywords": [
+    "reviewers",
+    "code-review",
+    "github",
+    "gitlab",
+    "codeowners",
+    "cli",
+    "typescript"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "prepare": "node scripts/prepare.mjs",
+    "build": "tsup && node scripts/build-cli.mjs",
+    "build:action": "node scripts/build-action.mjs",
+    "check:action": "pnpm run build:action && git diff --exit-code -- action-dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "pnpm run lint -- --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "docs": "typedoc",
+    "check:package": "node scripts/check-package.mjs",
+    "verify": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run check:examples && pnpm run test:coverage && pnpm run build && pnpm run check:package && pnpm run docs",
+    "release": "semantic-release",
+    "check:examples": "node scripts/check-examples.mjs"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.0.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "@eslint/js": "^10.0.1",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/github": "^12.0.0",
+    "@semantic-release/npm": "^13.1.5",
+    "@semantic-release/release-notes-generator": "^14.1.0",
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^5.0.0",
+    "consola": "^3.4.2",
+    "esbuild": "^0.28.1",
+    "eslint": "^10.10.0",
+    "eslint-config-prettier": "^10.1.0",
+    "fast-check": "^4.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.0.0",
+    "prettier": "^3.6.0",
+    "semantic-release": "^25.0.0",
+    "tsup": "^8.5.0",
+    "typedoc": "^0.28.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^5.0.0"
+  },
+  "packageManager": "pnpm@10.32.1",
+  "pnpm": {
+    "overrides": {
+      "esbuild": "^0.28.1"
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

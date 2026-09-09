@@ -1,0 +1,16 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    ["@semantic-release/npm", { "npmPublish": true }],
+    [
+      "@semantic-release/exec",
+      { "prepareCmd": "pnpm run build && pnpm run check:package" }
+    ],
+    [
+      "@semantic-release/github",
+      { "successComment": false, "failComment": false, "releasedLabels": false }
+    ]
+  ]
+}

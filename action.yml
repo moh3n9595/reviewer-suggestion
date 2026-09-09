@@ -1,0 +1,36 @@
+name: Reviewer Suggestion
+description: Explainable reviewer suggestions and opt-in assignment for GitHub and GitLab.
+author: Mohsen Madani
+branding:
+  icon: users
+  color: blue
+inputs:
+  provider:
+    description: github or gitlab
+    default: github
+  token:
+    description: Provider API token with access to repository members and review requests
+    default: ${{ github.token }}
+  repository:
+    description: GitHub owner/repo or GitLab project ID/path; inferred for GitHub events
+  number:
+    description: PR number or MR IID; inferred for GitHub pull request events
+  api-url:
+    description: Custom HTTPS API root (including /api/v3 or /api/v4 when needed)
+  config-path:
+    description: JSON ranking configuration read at the trusted base revision
+  limit:
+    description: Maximum suggested reviewers; overrides configuration
+  assign:
+    description: Explicitly request reviews (true or false)
+    default: 'false'
+outputs:
+  reviewers:
+    description: JSON array of selected usernames
+  result:
+    description: Full JSON suggestion result and diagnostics
+  assignment:
+    description: JSON assignment result
+runs:
+  using: node24
+  main: action-dist/index.mjs

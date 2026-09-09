@@ -1,0 +1,19 @@
+{
+  "entryPoints": ["src/index.ts"],
+  "out": "docs-api",
+  "name": "Reviewer Suggestion",
+  "readme": "README.md",
+  "treatWarningsAsErrors": true,
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": true
+  },
+  "requiredToBeDocumented": [
+    "Function",
+    "Interface",
+    "TypeAlias",
+    "Class",
+    "Enum"
+  ]
+}

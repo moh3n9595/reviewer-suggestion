@@ -1,0 +1,6 @@
+node_modules
+dist
+action-dist
+coverage
+docs-api
+package-lock.json

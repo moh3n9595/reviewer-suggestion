@@ -1,0 +1,6 @@
+exclude_patterns:
+  - action-dist/**
+  - dist/**
+  - coverage/**
+  - docs-api/**
+  - pnpm-lock.yaml
