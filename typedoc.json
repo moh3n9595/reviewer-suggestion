@@ -15,5 +15,6 @@
     "TypeAlias",
     "Class",
     "Enum"
-  ]
+  ],
+  "favicon": "assets/favicon.png"
 }
