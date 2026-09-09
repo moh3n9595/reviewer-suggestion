@@ -1,8 +1,12 @@
 {
+  "$schema": "https://typedoc.org/schema.json",
+  "plugin": ["typedoc-plugin-markdown"],
   "entryPoints": ["src/index.ts"],
-  "out": "docs-api",
-  "name": "Reviewer Suggestion",
-  "readme": "README.md",
+  "out": "docs/api",
+  "name": "API Reference",
+  "readme": "none",
+  "githubPages": false,
+  "hideGenerator": true,
   "treatWarningsAsErrors": true,
   "validation": {
     "notExported": true,
@@ -15,5 +19,15 @@
     "TypeAlias",
     "Class",
     "Enum"
-  ]
+  ],
+  "entryFileName": "README.md",
+  "hideBreadcrumbs": true,
+  "hidePageHeader": true,
+  "useCodeBlocks": true,
+  "indexFormat": "table",
+  "parametersFormat": "table",
+  "typeDeclarationFormat": "table",
+  "navigationJson": "docs/api/navigation.json",
+  "gitRevision": "main",
+  "formatWithPrettier": true
 }

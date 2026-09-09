@@ -8,7 +8,7 @@ export default tseslint.config(
       'dist/**',
       'action-dist/**',
       'coverage/**',
-      'docs-api/**',
+      'docs/**',
       'node_modules/**',
     ],
   },

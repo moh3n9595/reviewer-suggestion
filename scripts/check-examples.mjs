@@ -1,9 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import ts from 'typescript';
-const code = [
-  ...readFileSync('README.md', 'utf8').matchAll(/```ts\n([\s\S]*?)```/g),
-].map((match) => match[1]);
+const documents = ['README.md', 'docs/README.md'];
+const code = documents.flatMap((file) =>
+  [...readFileSync(file, 'utf8').matchAll(/```ts\n([\s\S]*?)```/g)].map(
+    (match) => match[1],
+  ),
+);
 const options = {
   strict: true,
   skipLibCheck: true,
@@ -36,5 +39,5 @@ if (diagnostics.length) {
   process.exitCode = 1;
 } else
   console.log(
-    `Compiled ${code.length} README TypeScript examples, including Consola compatibility.`,
+    `Compiled ${code.length} TypeScript examples from ${documents.join(' and ')}, including Consola compatibility.`,
   );

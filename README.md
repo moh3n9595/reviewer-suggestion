@@ -19,7 +19,7 @@ alice     0.6008  ranked
 
 Every selection includes its five signal scores, contributed files, owned files, history sources, and selection reason. Suggestions are read-only. Assignment is a separate, explicit operation.
 
-[API documentation](https://moh3n9595.github.io/reviewer-suggestion/) · [CLI](#cli) · [GitHub Action](#github-action) · [Configuration](#configuration) · [Releases](https://github.com/moh3n9595/reviewer-suggestion/releases)
+[Documentation](https://github.com/moh3n9595/reviewer-suggestion/tree/main/docs) · [CLI](#cli) · [GitHub Action](#github-action) · [Configuration](#configuration) · [Releases](https://github.com/moh3n9595/reviewer-suggestion/releases)
 
 ## Install
 

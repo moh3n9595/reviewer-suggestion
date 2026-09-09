@@ -1,7 +1,7 @@
 node_modules/
 dist/
 coverage/
-docs-api/
+docs/api/navigation.json
 *.tgz
 .env*
 !.env.example

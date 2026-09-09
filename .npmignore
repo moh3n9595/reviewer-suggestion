@@ -6,9 +6,10 @@ action-dist/
 .github/
 .husky/
 coverage/
-docs-api/
+docs/
 .env*
 *.config.*
 tsconfig.json
 action.yml
 *.tgz
+.gitbook.yaml

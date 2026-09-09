@@ -29,6 +29,8 @@ jobs:
         env:
           HUSKY: '0'
       - run: pnpm run verify
+      - name: Verify committed GitBook documentation
+        run: pnpm run check:docs
       - name: Build Action and upload Codecov bundle analysis
         run: pnpm run check:action
         env:
@@ -55,7 +57,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: api-docs
-          path: docs-api
+          path: docs/api
   compatibility:
     name: Compatibility (${{ matrix.os }}, Node ${{ matrix.node }})
     runs-on: ${{ matrix.os }}
