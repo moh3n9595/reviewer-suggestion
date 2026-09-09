@@ -16,11 +16,7 @@ remain at `0.0.0-development`; release tags and npm metadata are authoritative.
    `CodeFactor`; use squash merges with Conventional Commit titles. CodeFactor
    validates the pull-request head before merge because it does not emit another
    check for the squash commit on `main`.
-4. For the first publish, supply a short-lived publishing credential through the
-   `NPM_BOOTSTRAP_TOKEN` secret in the GitHub `npm` environment. Enable
-   `RELEASE_ENABLED` and dispatch `release.yml`; the GitHub-hosted runner publishes
-   with provenance after all quality gates pass.
-5. After the first publish, configure npm's trusted publisher for GitHub user
+4. Configure npm's trusted publisher for GitHub user
    `moh3n9595`, repository `reviewer-suggestion`, workflow `release.yml`, environment
    `npm`, with **direct npm publish allowed**.
    Alternatively, an authenticated owner with 2FA and npm 11.15+ can run:
@@ -29,10 +25,10 @@ remain at `0.0.0-development`; release tags and npm metadata are authoritative.
    npm trust github reviewer-suggestion --repo moh3n9595/reviewer-suggestion --file release.yml --env npm --allow-publish
    ```
 
-6. Delete `NPM_BOOTSTRAP_TOKEN` from the environment and revoke the credential.
-   Subsequent releases authenticate through GitHub OIDC without an npm secret.
-   See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
-7. Confirm npm's provenance display points to the expected repository/workflow.
+5. Confirm there is no `NPM_TOKEN` or `NODE_AUTH_TOKEN` secret, then set
+   `RELEASE_ENABLED=true`. Releases authenticate through GitHub OIDC. See
+   [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
+6. Confirm npm's provenance display points to the expected repository/workflow.
    Install the released version in a clean project and run `npm audit signatures`.
 
 Account-owner interaction may be required for npm 2FA and service installation.
