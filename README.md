@@ -17,7 +17,7 @@ REVIEWER  SCORE   REASON
 alice     0.6008  ranked
 ```
 
-Every selection includes its five signal scores, contributed files, owned files, and selection reason. Suggestions are read-only. Assignment is a separate, explicit operation.
+Every selection includes its five signal scores, contributed files, owned files, history sources, and selection reason. Suggestions are read-only. Assignment is a separate, explicit operation.
 
 [API documentation](https://moh3n9595.github.io/reviewer-suggestion/) · [CLI](#cli) · [GitHub Action](#github-action) · [Configuration](#configuration) · [Releases](https://github.com/moh3n9595/reviewer-suggestion/releases)
 
@@ -187,7 +187,7 @@ score = expertise × 0.45 + ownership × 0.25 + recency × 0.15
 
 Each signal is bounded to `[0, 1]`. The default pool contains active, non-bot repository writers/GitLab Developers or higher. The author, existing reviewers, and exclusions are removed. A normal selection requires actual contribution or ownership evidence. Ties use normalized username and ID, never random choice or API arrival order.
 
-Historical commits and CODEOWNERS are read at the captured target/base revision. Renames consult the previous path; files without history consult their parent directory. Files are equally weighted. Loads are repository-local and exclude the current request.
+Historical commits and CODEOWNERS are read at the captured target/base revision. Renames consult the previous path; files without history consult their parent directory. `evidence.historySources` maps changed paths to the actual historical paths, so directory proxies remain distinguishable from direct contributions. Files are equally weighted. Loads are repository-local and exclude the current request.
 
 ### Configuration
 
@@ -230,7 +230,7 @@ Commit emails are often private. GitHub-linked authors are preferred; otherwise 
 
 GitHub lookup order: `.github/CODEOWNERS`, `CODEOWNERS`, `docs/CODEOWNERS`. GitLab lookup order: `CODEOWNERS`, `docs/CODEOWNERS`, `.gitlab/CODEOWNERS`.
 
-Supported semantics include anchored paths, basename rules, directory rules, `*`, `**`, `?`, last-match precedence, and ownerless clearing. GitLab additionally supports sections, optional sections, section defaults, direct role owners, and section-local exclusions. GitHub-invalid negations and character-class patterns are skipped. Paths remain case-sensitive.
+Supported semantics include anchored paths, basename rules, directory rules, `*`, `**`, `?`, last-match precedence, and ownerless clearing. GitLab additionally supports character classes, sections, optional sections, section defaults, direct role owners, and section-local exclusions. GitLab treats owner mentions after an inline `#` as owners; GitHub ignores inline comments. GitHub-invalid negations and character-class patterns are skipped. Paths remain case-sensitive.
 
 Team/group ownership resolves to eligible individual users. Inaccessible resolution is reported as an optional signal warning. Section approval counts are parsed as metadata boundaries; this package does **not** enforce branch protection or required approvals. API capabilities vary by host version and token visibility; it does not claim support for every historical Enterprise/Self-Managed release.
 

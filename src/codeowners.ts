@@ -33,7 +33,8 @@ export function parseCodeOwners(
       defaults = (heading[2] ?? '').split(/\s+/).filter(Boolean);
       continue;
     }
-    const [pattern, ...owners] = line.split(/\s+/);
+    const [pattern, ...tokens] = line.split(/\s+/);
+    const owners = tokens.filter((token) => token.includes('@'));
     if (!pattern || (platform === 'github' && /[![\]\\]/.test(pattern)))
       continue;
     rules.push({
@@ -64,14 +65,22 @@ function matches(pattern: string, path: string): boolean {
         source += '.*';
         i++;
       }
+    } else if (char === '[' && value.indexOf(']', i + 1) > i + 1) {
+      const end = value.indexOf(']', i + 1);
+      source += `(?!/)[${value.slice(i + 1, end).replace(/^!/, '^')}]`;
+      i = end;
     } else if (char === '*') source += '[^/]*';
     else if (char === '?') source += '[^/]';
     else source += char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
   const prefix = anchored || value.includes('/') ? '^' : '(?:^|/)';
-  return new RegExp(
-    `${prefix}${source}${directory ? '/.*' : '(?:/.*)?'}$`,
-  ).test(path);
+  try {
+    return new RegExp(
+      `${prefix}${source}${directory ? '/.*' : '(?:/.*)?'}$`,
+    ).test(path);
+  } catch {
+    return false;
+  }
 }
 
 /**

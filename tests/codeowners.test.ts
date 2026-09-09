@@ -76,3 +76,22 @@ it('follows GitLab inline-comment semantics without treating prose as owners', (
   ]);
   expect(resolve('a', '* @alice # prose @bob', 'github')).toEqual(['alice']);
 });
+
+it('preserves GitLab default owners when inline prose names no owners', () => {
+  expect(resolve('src/a', '[Code] @alice\nsrc/ # prose', 'gitlab')).toEqual([
+    'alice',
+  ]);
+});
+
+it.each([
+  ['[ab].ts', 'a.ts', true],
+  ['[ab].ts', 'c.ts', false],
+  ['[!ab].ts', 'c.ts', true],
+  ['[z-a].ts', 'z.ts', false],
+  ['[', '[', true],
+  ['[]', '[]', true],
+])('matches GitLab character class %s against %s', (pattern, path, matches) => {
+  expect(resolve(path, `${pattern} @alice`, 'gitlab')).toEqual(
+    matches ? ['alice'] : [],
+  );
+});

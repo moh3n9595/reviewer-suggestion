@@ -210,3 +210,29 @@ describe('assignment', () => {
     expect(errorCode(new Error('token'))).toBe('UNEXPECTED_ERROR');
   });
 });
+
+it('explains parent-history proxies instead of implying direct file contributions', async () => {
+  const p = provider({
+    history: vi.fn(async (_ctx, path: string) =>
+      path === 'src'
+        ? [{ sha: 'x', username: 'alice', date: '2026-01-01' }]
+        : [],
+    ),
+    context: vi.fn(async () =>
+      context({
+        files: [
+          { path: 'src/new.ts', status: 'added' },
+          { path: 'src/another.ts', status: 'added' },
+        ],
+      }),
+    ),
+  });
+  const result = await suggestReviewers(p, {
+    repository: 'org/repo',
+    number: 1,
+  });
+  expect(result.selected[0]!.evidence.historySources).toEqual({
+    'src/another.ts': 'src',
+    'src/new.ts': 'src',
+  });
+});

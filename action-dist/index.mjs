@@ -289,13 +289,20 @@ function rankReviewers(snapshot, options = {}) {
     let recency = 0;
     const contributedFiles = [];
     const ownedFiles = [];
+    const historySources = {};
     for (const file of files) {
       const commits = [
         ...new Map(
           file.contributions.filter((c) => resolveAuthor(c) === username).map((c) => [c.sha, c])
         ).values()
       ];
-      if (commits.length) contributedFiles.push(file.path);
+      if (commits.length) {
+        contributedFiles.push(file.path);
+        Object.defineProperty(historySources, file.path, {
+          value: file.historySource,
+          enumerable: true
+        });
+      }
       expertise += Math.log1p(Math.min(commits.length, opts.historyLimit)) / Math.log1p(opts.historyLimit);
       const dates = commits.map((c) => Date.parse(c.date)).filter(Number.isFinite);
       if (dates.length) {
@@ -328,7 +335,10 @@ function rankReviewers(snapshot, options = {}) {
       breakdown,
       evidence: {
         contributedFiles: contributedFiles.sort(),
-        ownedFiles: ownedFiles.sort()
+        ownedFiles: ownedFiles.sort(),
+        historySources: Object.fromEntries(
+          Object.entries(historySources).sort(([a], [b]) => compare(a, b))
+        )
       },
       reason: "ranked"
     };
@@ -783,7 +793,8 @@ function parseCodeOwners(content, platform) {
       defaults2 = (heading[2] ?? "").split(/\s+/).filter(Boolean);
       continue;
     }
-    const [pattern, ...owners] = line.split(/\s+/);
+    const [pattern, ...tokens] = line.split(/\s+/);
+    const owners = tokens.filter((token) => token.includes("@"));
     if (!pattern || platform === "github" && /[![\]\\]/.test(pattern))
       continue;
     rules.push({
@@ -811,14 +822,22 @@ function matches(pattern, path) {
         source += ".*";
         i++;
       }
+    } else if (char === "[" && value.indexOf("]", i + 1) > i + 1) {
+      const end = value.indexOf("]", i + 1);
+      source += `(?!/)[${value.slice(i + 1, end).replace(/^!/, "^")}]`;
+      i = end;
     } else if (char === "*") source += "[^/]*";
     else if (char === "?") source += "[^/]";
     else source += char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
   const prefix = anchored || value.includes("/") ? "^" : "(?:^|/)";
-  return new RegExp(
-    `${prefix}${source}${directory ? "/.*" : "(?:/.*)?"}$`
-  ).test(path);
+  try {
+    return new RegExp(
+      `${prefix}${source}${directory ? "/.*" : "(?:/.*)?"}$`
+    ).test(path);
+  } catch {
+    return false;
+  }
 }
 function resolveCodeOwners(path, rules) {
   const sections = /* @__PURE__ */ new Map();

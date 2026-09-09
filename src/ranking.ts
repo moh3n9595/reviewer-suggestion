@@ -150,6 +150,7 @@ export function rankReviewers(
       let recency = 0;
       const contributedFiles: string[] = [];
       const ownedFiles: string[] = [];
+      const historySources: Record<string, string> = {};
       for (const file of files) {
         const commits = [
           ...new Map(
@@ -158,7 +159,13 @@ export function rankReviewers(
               .map((c) => [c.sha, c]),
           ).values(),
         ];
-        if (commits.length) contributedFiles.push(file.path);
+        if (commits.length) {
+          contributedFiles.push(file.path);
+          Object.defineProperty(historySources, file.path, {
+            value: file.historySource,
+            enumerable: true,
+          });
+        }
         expertise +=
           Math.log1p(Math.min(commits.length, opts.historyLimit)) /
           Math.log1p(opts.historyLimit);
@@ -199,6 +206,9 @@ export function rankReviewers(
         evidence: {
           contributedFiles: contributedFiles.sort(),
           ownedFiles: ownedFiles.sort(),
+          historySources: Object.fromEntries(
+            Object.entries(historySources).sort(([a], [b]) => compare(a, b)),
+          ),
         },
         reason: 'ranked' as const,
       };

@@ -94,7 +94,14 @@ export interface RankingOptions {
 export interface ScoredCandidate extends Identity {
   score: number;
   breakdown: Scores;
-  evidence: { contributedFiles: string[]; ownedFiles: string[] };
+  evidence: {
+    contributedFiles: string[];
+    ownedFiles: string[];
+    /** Changed path → history path; exposes parent-directory proxies. */ historySources: Record<
+      string,
+      string
+    >;
+  };
   reason:
     'ranked' | 'owner-fallback' | 'maintainer-fallback' | 'member-fallback';
 }
