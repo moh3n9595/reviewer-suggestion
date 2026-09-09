@@ -14,12 +14,11 @@ remain at `0.0.0-development`; release tags and npm metadata are authoritative.
 3. Create the GitHub `npm` environment, restricted to the `main` branch. Configure
    branch protection to require `Release readiness`, `codecov/project`, and
    `CodeFactor`; use squash merges with Conventional Commit titles.
-4. Confirm the package exists on npm before enabling releases. npm currently
-   [requires an existing package to configure trust](https://docs.npmjs.com/cli/v11/commands/npm-trust/#prerequisites).
-   If the name is unpublished, leave `RELEASE_ENABLED=false` until the owner has
-   resolved initial package creation. This workflow has no npm token fallback;
-   GitHub OIDC cannot establish package ownership by itself.
-5. In npm package settings, configure the trusted publisher for GitHub user
+4. For the first publish, supply a short-lived publishing credential through the
+   `NPM_BOOTSTRAP_TOKEN` secret in the GitHub `npm` environment. Enable
+   `RELEASE_ENABLED` and dispatch `release.yml`; the GitHub-hosted runner publishes
+   with provenance after all quality gates pass.
+5. After the first publish, configure npm's trusted publisher for GitHub user
    `moh3n9595`, repository `reviewer-suggestion`, workflow `release.yml`, environment
    `npm`, with **direct npm publish allowed**.
    Alternatively, an authenticated owner with 2FA and npm 11.15+ can run:
@@ -28,10 +27,9 @@ remain at `0.0.0-development`; release tags and npm metadata are authoritative.
    npm trust github reviewer-suggestion --repo moh3n9595/reviewer-suggestion --file release.yml --env npm --allow-publish
    ```
 
-6. Set repository variable `RELEASE_ENABLED=true`, then dispatch `release.yml`.
-   Release checks independently verify the current main commit before publishing.
-   Authentication uses GitHub OIDC; no `NPM_TOKEN` or `NODE_AUTH_TOKEN` secret is
-   required. See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
+6. Delete `NPM_BOOTSTRAP_TOKEN` from the environment and revoke the credential.
+   Subsequent releases authenticate through GitHub OIDC without an npm secret.
+   See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
 7. Confirm npm's provenance display points to the expected repository/workflow.
    Install the released version in a clean project and run `npm audit signatures`.
 

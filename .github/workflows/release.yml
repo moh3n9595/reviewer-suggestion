@@ -40,6 +40,7 @@ jobs:
         run: pnpm run release
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          NPM_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
       - name: Advance Action major tag after publication
         env:
           GH_TOKEN: ${{ github.token }}

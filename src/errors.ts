@@ -1,6 +1,6 @@
 /** Typed operational or validation failure. Messages intentionally omit API bodies. */
 export class ReviewerError extends Error {
-  /** @param code Stable machine-readable failure code. @param message Safe diagnostic. */
+  /** @param code - Stable machine-readable failure code. @param message - Safe diagnostic. */
   constructor(
     public readonly code: string,
     message: string,

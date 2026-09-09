@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
+import tsdoc from 'eslint-plugin-tsdoc';
 export default tseslint.config(
   {
     ignores: [
@@ -18,6 +19,7 @@ export default tseslint.config(
   },
   {
     files: ['**/*.ts'],
+    plugins: { tsdoc },
     extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],
     languageOptions: {
       parserOptions: {
@@ -26,6 +28,7 @@ export default tseslint.config(
       },
     },
     rules: {
+      'tsdoc/syntax': 'error',
       '@typescript-eslint/restrict-template-expressions': [
         'error',
         { allowNumber: true },
