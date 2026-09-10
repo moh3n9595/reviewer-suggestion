@@ -10,3 +10,7 @@ reproduction, and expected impact.
 Tokens remain in the caller's process and are sent only to the configured HTTPS
 API origin. Custom transports and loggers are trusted caller code. The Action must
 not be combined with execution of untrusted PR code in a privileged workflow.
+
+The [enterprise adoption guide](docs/enterprise.md) documents the full data-flow
+statement, supply-chain verification steps (provenance, SBOM, `npm audit
+signatures`), and proxy/private-CA operation for security reviews.

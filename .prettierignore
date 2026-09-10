@@ -4,3 +4,4 @@ action-dist
 coverage
 docs-api
 package-lock.json
+sbom.spdx.json

@@ -6,3 +6,5 @@ docs-api/
 .env*
 !.env.example
 .DS_Store
+/sbom.spdx.json
+/ROADMAP.local.md
