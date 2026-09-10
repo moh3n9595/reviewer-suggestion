@@ -3,6 +3,7 @@
   "out": "docs-api",
   "name": "Reviewer Suggestion",
   "readme": "README.md",
+  "projectDocuments": ["docs/*.md"],
   "treatWarningsAsErrors": true,
   "validation": {
     "notExported": true,

@@ -20,7 +20,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "pnpm exec prettier CHANGELOG.md --write && pnpm run build && pnpm run check:package"
+        "prepareCmd": "pnpm exec prettier CHANGELOG.md --write && pnpm run build && pnpm run check:package && node scripts/generate-sbom.mjs ${nextRelease.version} sbom.spdx.json"
       }
     ],
     [
@@ -40,6 +40,10 @@
           {
             "path": "action-dist/index.mjs",
             "label": "Reviewer Suggestion GitHub Action bundle"
+          },
+          {
+            "path": "sbom.spdx.json",
+            "label": "SPDX software bill of materials"
           }
         ]
       }

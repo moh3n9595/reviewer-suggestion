@@ -1,9 +1,18 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import ts from 'typescript';
-const code = [
-  ...readFileSync('README.md', 'utf8').matchAll(/```ts\n([\s\S]*?)```/g),
-].map((match) => match[1]);
+const sources = [
+  'README.md',
+  ...readdirSync('docs')
+    .filter((name) => name.endsWith('.md'))
+    .sort()
+    .map((name) => `docs/${name}`),
+];
+const code = sources.flatMap((source) =>
+  [...readFileSync(source, 'utf8').matchAll(/```ts\n([\s\S]*?)```/g)].map(
+    (match) => match[1],
+  ),
+);
 const options = {
   strict: true,
   skipLibCheck: true,
@@ -36,5 +45,5 @@ if (diagnostics.length) {
   process.exitCode = 1;
 } else
   console.log(
-    `Compiled ${code.length} README TypeScript examples, including Consola compatibility.`,
+    `Compiled ${code.length} TypeScript examples from ${sources.length} documentation files, including Consola compatibility.`,
   );

@@ -68,8 +68,9 @@
     "test:coverage": "vitest run --coverage",
     "docs": "typedoc",
     "check:release-notes": "node scripts/action-release-notes.mjs 1.2.3",
+    "check:sbom": "node scripts/generate-sbom.mjs 1.2.3",
     "check:package": "node scripts/check-package.mjs",
-    "verify": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run check:examples && pnpm run check:release-notes && pnpm run test:coverage && pnpm run build && pnpm run check:package && pnpm run docs",
+    "verify": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run check:examples && pnpm run check:release-notes && pnpm run check:sbom && pnpm run test:coverage && pnpm run build && pnpm run check:package && pnpm run docs",
     "release": "semantic-release",
     "check:examples": "node scripts/check-examples.mjs"
   },

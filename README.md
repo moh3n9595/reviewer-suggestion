@@ -23,7 +23,7 @@ alice     0.6008  ranked
 
 Every selection includes its five signal scores, contributed files, owned files, history sources, and selection reason. Suggestions are read-only. Assignment is a separate, explicit operation.
 
-[API documentation](https://moh3n9595.github.io/reviewer-suggestion/) · [CLI](#cli) · [GitHub Action](#github-action) · [Configuration](#configuration) · [Releases](https://github.com/moh3n9595/reviewer-suggestion/releases)
+[API documentation](https://moh3n9595.github.io/reviewer-suggestion/) · [Guides](#guides) · [CLI](#cli) · [GitHub Action](#github-action) · [Enterprise](#enterprise-adoption) · [Releases](https://github.com/moh3n9595/reviewer-suggestion/releases)
 
 ## Install
 
@@ -81,25 +81,20 @@ const result = await suggestReviewers(
 console.log(result.selected);
 ```
 
-### Bring your own logger
+Providers accept an optional Consola-compatible `logger` and a custom `fetch`; the library is silent by default, and custom `ReviewerProvider` implementations can wrap existing Octokit or Gitbeaker clients. See the [recipes guide](docs/recipes.md).
 
-The library is silent by default. Pass any logger implementing `debug`, `info`, and `warn`; **Consola** is compatible and remains your optional dependency:
+### Try it without credentials
+
+`rankReviewers(snapshot, options)` runs the same engine on previously collected or synthetic data — no network, no account, no token — and `now` pins the clock so a ranking reproduces exactly:
 
 ```ts
-import { consola } from 'consola';
-import { createGitHubProvider } from 'reviewer-suggestion';
+import { rankReviewers, type ReviewerSnapshot } from 'reviewer-suggestion';
 
-const provider = createGitHubProvider({
-  token: process.env.GITHUB_TOKEN!,
-  logger: consola,
-});
+declare const snapshot: ReviewerSnapshot; // collected earlier, or synthetic
+console.log(rankReviewers(snapshot, { now: '2026-01-01T00:00:00Z' }).selected);
 ```
 
-Built-in events contain counts and diagnostic codes, not tokens, raw API bodies, or email mappings. A logger should not throw. Custom providers can wrap existing Octokit or Gitbeaker clients by implementing `ReviewerProvider`.
-
-### Offline ranking
-
-Use `rankReviewers(snapshot, options)` with a `ReviewerSnapshot` to rank previously collected or synthetic data without network access. Set `now` to reproduce the same ranking later. See [the compiled example](examples/offline.ts).
+[The compiled example](examples/offline.ts) builds a complete synthetic snapshot you can run immediately.
 
 ## CLI
 
@@ -158,7 +153,7 @@ jobs:
 
 Use a release commit SHA when you need an immutable Action reference. The Action reads APIs and base-revision configuration; it does not require a checkout. Keep `pull_request_target` jobs free of steps that check out or execute pull-request code.
 
-To assign, set `assign: 'true'` and use a token with review-request write permission. GitHub's default token is sufficient only where it can enumerate eligible collaborators and access all requested signals; organization/team access may require a GitHub App installation token or PAT. Fork `pull_request` workflows usually have read-only tokens and no repository secrets. See [GitHub's collaborator endpoint permissions](https://docs.github.com/en/rest/collaborators/collaborators).
+To assign, set `assign: 'true'` and use a token with review-request write permission. Organization/team access usually calls for a GitHub App installation token — see [authentication and permissions](docs/permissions.md) for the per-operation permission matrix and an App-token workflow.
 
 | Input                  | Default                                                     |
 | ---------------------- | ----------------------------------------------------------- |
@@ -172,8 +167,6 @@ To assign, set `assign: 'true'` and use a token with review-request write permis
 
 Outputs: `reviewers` (JSON username array), `result` (full suggestion JSON), and `assignment` (assigned/skipped/failed identities). The Action also writes a Markdown job summary. Supply `provider: gitlab`, explicit `repository` and `number`, and a GitLab token to target GitLab from GitHub Actions.
 
-Custom hosts must be reachable from the runner and present trusted TLS certificates. The Action uses Node.js 24; Enterprise runners must support that Action runtime.
-
 ## How ranking works
 
 ```text
@@ -181,85 +174,54 @@ score = expertise × 0.45 + ownership × 0.25 + recency × 0.15
       + access    × 0.10 + availability × 0.05
 ```
 
-| Signal       | Calculation                                                                     |
-| ------------ | ------------------------------------------------------------------------------- |
-| Expertise    | Average `log(1 + author commits) / log(1 + historyLimit)` per changed file      |
-| Ownership    | Fraction of changed files owned by the candidate                                |
-| Recency      | Average `2^(-ageDays / halfLifeDays)` per changed file; zero beyond the horizon |
-| Access       | Writer/Developer `0.6`, Maintainer `0.9`, Admin/Owner `1`                       |
-| Availability | `max(0, 1 - openReviewLoad / maxReviewLoad)`                                    |
+Each signal is bounded to `[0, 1]` and backed by evidence: per-file commit history (renames and parent directories included), CODEOWNERS at the base revision, repository access level, and current open review load. Ties break on normalized username and ID — never randomness or API arrival order — and a captured clock makes every run reproducible. A normal selection requires actual contribution or ownership evidence; fallback is explicit and off by default.
 
-Each signal is bounded to `[0, 1]`. The default pool contains active, non-bot repository writers/GitLab Developers or higher. The author, existing reviewers, and exclusions are removed. A normal selection requires actual contribution or ownership evidence. Ties use normalized username and ID, never random choice or API arrival order.
-
-Historical commits and CODEOWNERS are read at the captured target/base revision. Renames consult the previous path; files without history consult their parent directory. `evidence.historySources` maps changed paths to the actual historical paths, so directory proxies remain distinguishable from direct contributions. Files are equally weighted. Loads are repository-local and exclude the current request.
-
-### Configuration
+Configuration is plain JSON with strict validation:
 
 ```json
 {
   "limit": 2,
   "minScore": 0.05,
-  "historyLimit": 30,
-  "maxReviewLoad": 8,
-  "halfLifeDays": 30,
-  "horizonDays": 180,
   "exclude": ["automation-bot"],
-  "aliases": { "developer@example.com": "alice" },
-  "fallback": false
+  "aliases": { "developer@example.com": "alice" }
 }
 ```
 
-Additional library/JSON options:
+The [ranking model guide](docs/ranking.md) documents every signal, option, default, fallback tier, and failure semantic.
 
-- `now`: ISO timestamp; defaults to one captured current time per run.
-- `weights`: overrides to the five weights; the resulting values must be nonnegative and sum to one.
-- `limit: 0`: return no selected candidates.
+## Guides
 
-Fallback is **off** by default. When enabled and normal selection is empty, eligible owners come first, then maintainers, then other eligible members. Results identify the fallback tier. Empty changes never trigger fallback.
+- [Ranking model](docs/ranking.md) — signals, configuration reference, determinism, fallback, partial results.
+- [Authentication and permissions](docs/permissions.md) — per-operation scopes, GitHub App setup, fine-grained PATs, GitLab tokens, identity resolution.
+- [CODEOWNERS compatibility](docs/codeowners.md) — supported semantics, and how suggestions relate to CODEOWNERS and required approvals.
+- [Recipes](docs/recipes.md) — small teams, monorepos, GitLab CI, custom hosts, incomplete identity data.
+- [Troubleshooting](docs/troubleshooting.md) — error codes, exit codes, warnings, and debugging a decision.
+- [Enterprise adoption](docs/enterprise.md) — data flow, supply chain, proxies and private CAs, air-gapped installs.
 
-Provider options include `fetch`, `logger`, `signal`, `timeoutMs` (15,000), `retries` (2), `concurrency` (5), and `maxPages` (100). History is capped at `historyLimit`; other pagination exceeding its budget is explicitly reported. Retry delays are bounded to 30 seconds.
+## Enterprise adoption
 
-## Authentication and data availability
+Built to pass a security review, not just a demo:
 
-| Provider | Suggestion access                                                                                                                           | Assignment access                                            |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| GitHub   | Repository metadata, contents and pull requests read; authorization to list collaborators; organization/team visibility for group ownership | Pull requests write; same read capabilities for revalidation |
-| GitLab   | Token with `read_api`, visible project members, commits and files; group visibility for group owners                                        | Token with `api` and permission to update MR reviewers       |
+- **Nothing leaves your infrastructure.** Outbound requests go only to the configured HTTPS API root; no telemetry, no AI service, zero runtime dependencies, tokens never logged.
+- **Verifiable supply chain.** npm trusted publishing (OIDC, no registry token) with provenance on every release, an SPDX SBOM attached to each GitHub release, and immutable version tags; verify with `npm audit signatures`.
+- **Deterministic and auditable.** Identical inputs produce identical output, and every decision ships with its full evidence — a retainable decision record.
+- **Self-hosted ready.** GitHub Enterprise Server and self-managed GitLab via `apiUrl`, private CAs via `NODE_EXTRA_CA_CERTS`, proxy guidance, and air-gapped installation paths.
 
-GitHub App installation tokens, fine-grained PATs, or classic PATs can be supplied as GitHub tokens. GitLab personal/project/group access tokens work when their user and scopes expose the required endpoints. GitLab CI job tokens are not a general replacement for these API permissions.
-
-Commit emails are often private. GitHub-linked authors are preferred; otherwise known member emails and explicit `aliases` are used. Display names are never identity evidence. Ambiguous email matches are ignored. On GitLab, explicit aliases are often necessary for historical expertise. Email CODEOWNERS entries likewise need a resolvable email identity.
-
-## CODEOWNERS compatibility
-
-GitHub lookup order: `.github/CODEOWNERS`, `CODEOWNERS`, `docs/CODEOWNERS`. GitLab lookup order: `CODEOWNERS`, `docs/CODEOWNERS`, `.gitlab/CODEOWNERS`.
-
-Supported semantics include anchored paths, basename rules, directory rules, `*`, `**`, `?`, last-match precedence, and ownerless clearing. GitLab additionally supports character classes, sections, optional sections, section defaults, direct role owners, and section-local exclusions. GitLab treats owner mentions after an inline `#` as owners; GitHub ignores inline comments. GitHub-invalid negations and character-class patterns are skipped. Paths remain case-sensitive.
-
-Team/group ownership resolves to eligible individual users. Inaccessible resolution is reported as an optional signal warning. Section approval counts are parsed as metadata boundaries; this package does **not** enforce branch protection or required approvals. API capabilities vary by host version and token visibility; it does not claim support for every historical Enterprise/Self-Managed release.
+The [enterprise guide](docs/enterprise.md) states each claim in citable form, with the enforcement behind it.
 
 ## Failures and assignment guarantees
 
-Essential context/member failures throw `ReviewerError` with a stable `code`. Optional history, ownership, and workload failures return `warnings` and `partial: true`. Unavailable signals contribute zero; an unknown workload is not interpreted as an empty workload. Scores are not renormalized around missing data.
-
-`belowThreshold` contains at most three evidenced candidates for diagnostics. No suggestion is a valid outcome, not a network error.
-
-Assignment revalidates identities and eligibility, rejects closed/draft requests, deduplicates reviewers, and preserves existing assignments. After an ambiguous write, it re-reads the request to distinguish observed assignments from failures. It does not blindly retry writes. GitLab's replace-style reviewer API cannot provide atomic merging against simultaneous external edits. Inspect `failed`, including `ASSIGNMENT_UNCONFIRMED`, before taking further action.
+Essential failures throw `ReviewerError` with a stable `code`; optional signal failures return `warnings` and `partial: true` instead of guessing. No suggestion is a valid outcome, not a network error. Assignment revalidates identities and eligibility, preserves existing reviewers, and reconciles ambiguous writes by re-reading the request rather than blindly retrying. The [troubleshooting guide](docs/troubleshooting.md) documents every code and its fix.
 
 ## Quality and releases
 
 - Strict TypeScript and type-aware ESLint, with Prettier formatting.
-- Vitest unit, HTTP-fixture, entrypoint, and property-based tests.
-- Required **100% per-file** statements, branches, functions, and lines for authored runtime source.
-- Codecov reporting with a `unit` flag, 100% component gates, and Vite bundle
-  analysis for the shipped Action; CodeFactor analysis; badges display the
-  actual external results.
-- Installed-package checks for ESM, CommonJS, TypeScript, and the CLI on Linux, macOS, and Windows.
-- GitHub Actions builds and npm provenance; inspect the package's **Built and signed on GitHub Actions** details on npm after publication.
+- Vitest unit, HTTP-fixture, entrypoint, and property-based tests; required **100% per-file** coverage for authored runtime source.
+- Codecov and CodeFactor gates; installed-package checks for ESM, CommonJS, TypeScript, and the CLI on Linux, macOS, and Windows.
+- Documentation examples — including the guides — are compiled in CI, so they cannot drift from the API.
+- GitHub Actions builds with npm trusted publishing and provenance; inspect the package's **Built and signed on GitHub Actions** details on npm, and verify with `npm audit signatures`.
 
-Verify installed registry signatures and attestations with `npm audit signatures`. Provenance links a published artifact to its build; it is not a correctness guarantee. See [npm provenance](https://docs.npmjs.com/generating-provenance-statements/).
-
-Releases follow Conventional Commits: `fix` publishes a patch, `feat` a minor, and breaking changes a major. Eligible `main` merges release automatically after checks pass. Each release updates the committed [changelog](CHANGELOG.md), publishes matching npm and GitHub versions, attaches the runnable Action bundle, and advances the compatible major Action tag only after synchronization checks pass. `v1.2.3` is an immutable release; `v1` intentionally moves to the newest compatible v1 Action. See [release setup](RELEASING.md).
+Releases follow Conventional Commits: `fix` publishes a patch, `feat` a minor, and breaking changes a major. Each release updates the committed [changelog](CHANGELOG.md), publishes matching npm and GitHub versions, attaches the runnable Action bundle and an SPDX SBOM, and advances the compatible major Action tag only after synchronization checks pass. `v1.2.3` is an immutable release; `v1` intentionally moves to the newest compatible v1 Action. See [release setup](RELEASING.md).
 
 ## Contributing
 
